@@ -3,16 +3,23 @@ import chess_state
 
 def evaluate_material(board, q=9, r=5, b=3, n=3, p=1):
     acc = 0
-    acc += p * (len(board.pieces(chess.PAWN, chess.WHITE)) -
-            len(board.pieces(chess.PAWN, chess.BLACK)))
-    acc += n * (len(board.pieces(chess.KNIGHT, chess.WHITE)) -
-            len(board.pieces(chess.KNIGHT, chess.BLACK)))
-    acc += b * (len(board.pieces(chess.BISHOP, chess.WHITE)) -
-            len(board.pieces(chess.BISHOP, chess.BLACK)))
-    acc += r * (len(board.pieces(chess.ROOK, chess.WHITE)) -
-            len(board.pieces(chess.ROOK, chess.BLACK)))
-    acc += q * (len(board.pieces(chess.QUEEN, chess.WHITE)) -
-            len(board.pieces(chess.QUEEN, chess.BLACK)))
+    values = {
+            chess.PAWN: p,
+            chess.KNIGHT: n,
+            chess.BISHOP: b,
+            chess.ROOK: r,
+            chess.QUEEN: q,
+            }
+    for i in range(64):
+        piece = board.piece_at(i)
+
+        if not piece:
+            continue
+
+        if piece.color == chess.WHITE:
+            acc += values.get(piece.piece_type, 0)
+        else:
+            acc -= values.get(piece.piece_type, 0)
 
     return acc
 

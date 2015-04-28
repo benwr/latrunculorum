@@ -5,9 +5,23 @@ class ChessState(chess.Board):
     """
     Chess board subclass implementing the interface needed for minimax
     """
-    def __init__(self, evaluate=(lambda _: return 0),  fen=None):
+    def __init__(self, evaluate=(lambda _: 0),  fen=None):
         self.evaluate = evaluate
         super().__init__(fen=fen)
+
+    def __str__(self):
+        result = []
+        for i in range(8):
+            line = []
+            for j in range(8):
+                piece = self.piece_at(8*i+j)
+                if piece:
+                    line.append(piece.symbol())
+                else:
+                    line.append('#')
+            result.append(''.join(line))
+        return '\n'.join(reversed(result))
+
 
     def value(self):
         if (self.is_stalemate() or

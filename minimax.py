@@ -30,24 +30,24 @@ class MinimaxState(object):
     def is_terminal(self):
         raise NotImplementedError
 
-MAX = True
-MIN = False
+MAX = 1
+MIN = -1
 
 def minimax(state, player=MAX, maxdepth=-1):
     """
     Return a (value, move) tuple representing the action taken by player.
     """
-    best = None
     better = max if player == MAX else min
+    results = []
     for move in state.moves():
         result = state.do(move)
         if maxdepth != 0:
-            val = ((result.value(), move)
-                    if result.is_terminal()
-                    else minimax(result,
-                        player=(not player),
-                        maxdepth=(maxdepth - 1)))
+            results.append((result.value(), move)
+                if result.is_terminal()
+                else (minimax(result, player=(-player), maxdepth=(maxdepth - 1))[0], move))
         else:
-            val = (result.value(), move)
-        best = better(val, best)
+            results.append((result.value(), move))
+
+
+    best = better(results, key=(lambda a: a[0]))
     return best

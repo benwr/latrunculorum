@@ -10,9 +10,9 @@ class ChessState(chess.Board):
         super().__init__(fen=fen)
 
     def __str__(self):
-        result = []
+        result = ['  ABCDEFGH']
         for i in range(8):
-            line = []
+            line = [str(i+1), ' ']
             for j in range(8):
                 piece = self.piece_at(8*i+j)
                 if piece:

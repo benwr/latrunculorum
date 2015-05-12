@@ -3,13 +3,16 @@ import sys
 
 class ChessState(chess.Board):
     """
-    Chess board subclass implementing the interface needed for minimax
+    Chessboard subclass implementing the interface needed for minimax
     """
     def __init__(self, evaluate=(lambda _: 0),  fen=None):
+        # evaluate is an heuristic function taking a board state
+        # and returning an approximate value.
         self.evaluate = evaluate
         super().__init__(fen=fen)
 
     def __str__(self):
+        # Board representation
         result = ['  ABCDEFGH']
         for i in range(8):
             line = [str(i+1), ' ']
@@ -24,11 +27,14 @@ class ChessState(chess.Board):
 
 
     def value(self):
+        """Get ground value of state, if exists, or evaluate(state) if not."""
+        # draws are neutral
         if (self.is_stalemate() or
                 self.is_insufficient_material() or
                 self.can_claim_draw()):
             return 0
 
+        # Good for winner, bad for loser
         if self.is_checkmate():
             return float("inf" if self.turn == chess.BLACK else "-inf")
 

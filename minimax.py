@@ -41,12 +41,11 @@ def minimax(state, player=MAX, maxdepth=-1):
     results = []
     for move in state.moves():
         result = state.do(move)
-        if maxdepth != 0:
-            results.append((result.value(), move)
-                if result.is_terminal()
-                else (minimax(result, player=(-player), maxdepth=(maxdepth - 1))[0], move))
-        else:
+        if maxdepth != 0 or result.is_terminal():
             results.append((result.value(), move))
+        else:
+            value = minimax(result, player=(-player), maxdepth=(maxdepth - 1))[0]
+            results.append((value, move))
 
 
     best = better(results, key=(lambda a: a[0]))

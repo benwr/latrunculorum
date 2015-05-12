@@ -35,7 +35,7 @@ class Bot(object):
 def main(player=chess.WHITE, searchdepth=2):
     b = Bot(player=player, searchdepth=searchdepth)
     if player == chess.WHITE:
-        # if the bot is white, make a first maove.
+        # if the bot is white, make a first move.
         m = b.choose_move()
         print(m.uci())
         b.make_move(m)
@@ -72,7 +72,6 @@ def main(player=chess.WHITE, searchdepth=2):
         if b.state.is_game_over():
             print("Game over!")
             break
-
 
 if __name__ == "__main__":
     args = argparser.parse_args()

@@ -37,7 +37,7 @@ class MaterialEvaluator(object):
 
         return acc
 
-class compound_evaluate(object):
+class CompoundEvaluate(object):
     def __init__(self, evaluator_pairs=None):
         self.evaluators = evaluator_pairs or [(1, MaterialEvaluator())]
 

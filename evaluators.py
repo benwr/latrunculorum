@@ -2,6 +2,12 @@ import chess
 import chess_state
 
 class MaterialEvaluator(object):
+    """
+    Simple evaluator based on the material on the board.
+
+    Uses well-known piece values by default, but can be initialized with other
+    values.
+    """
     def __init__(self, q=9, r=5, b=3, n=3, p=1, memoize=True):
         self.q, self.r, self.b, self.n, self.p = q, r, b, n, p
         self.memoize = memoize
@@ -37,8 +43,22 @@ class MaterialEvaluator(object):
 
         return acc
 
+
+class CenterEvaluator(object):
+    pass
+
+class MobilityEvaluator(object):
+    pass
+
+class PawnStructureEvaluator(object):
+    pass
+
+class KingSafetyEvaluator(object):
+    pass
+
+
 class CompoundEvaluate(object):
-    def __init__(self, evaluator_pairs=None):
+    def __init__(self, evaluator_pairs=None, use_tts=True):
         self.evaluators = evaluator_pairs or [(1, MaterialEvaluator())]
 
     def __call__(self, board):

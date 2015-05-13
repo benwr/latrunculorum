@@ -50,7 +50,6 @@ class Bot(object):
 class Supervisor():
     bots = []
     def __init__(self, number):
-#        self.bots = []
         for i in range(0, number):
             self.bots.append(Bot())
 
@@ -73,20 +72,6 @@ class Supervisor():
                         other_bot.reset_game()
                         
                         break
-
-#        while True:
-#            m1 = self.bot1.choose_move()
-#            self.bot1.make_move(m1)
-#            m2 = self.bot2.choose_move()
-#            self.bot2.make_move(m2)
-
-#            print(self.bot2.state)
-
-#            if self.bot1.state.is_game_over() or self.bot2.state.is_game_over():
-#               print("game over!")
-#                break
-            
-            #time.sleep(2)
 
 def main():
     supervisor = Supervisor(3)

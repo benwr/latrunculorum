@@ -53,49 +53,33 @@ def minimax(state, player=MAX, maxdepth=-1):
     best = better(results, key=(lambda a: a[0]))
     return best
 
-def max_value(state, alpha, beta, depth):
+# The alpha-beta pruning function will only work with chess
+# due to the generate_legal_moves method.
+def max_value(state, alpha, beta, depth, player):
     if state.is_terminal() or depth == 0:
         return (None, state.value())
 
-    v = float("-inf")
+    v = float("-inf") * player
     best = None
+    worse = (lambda a, b: a < b) if (player == MAX) else (lambda a, b: a > b)
 
     for move in state.generate_legal_moves():
         state.push(move)
-        _, result = min_value(state, alpha, beta, depth=(depth-1))
-        if result is not None and v < result:
+        _, result = max_value(state, alpha, beta, (depth-1), -player)
+        state.pop()
+        if result is not None and worse(v, result):
             v = result
             best = move
-        state.pop()
-        if v >= beta:
+        if not worse(v, beta if player == MAX else alpha):
             return (move, v)
-        alpha = max(alpha, v)
 
-    return (best, v)
-
-def min_value(state, alpha, beta, depth):
-    if state.is_terminal() or depth == 0:
-        return (None, state.value())
-
-    v = float("inf")
-    best = None
-
-    for move in state.generate_legal_moves():
-        state.push(move)
-        _, result = max_value(state, alpha, beta, depth=(depth-1))
-        if result is not None and v > result:
-            v = result
-            best = move
-        state.pop()
-        if v <= alpha:
-            return (move, v)
-        beta = min(beta, v)
+        if worse(alpha, v) and player == MAX:
+            alpha = v
+        if worse(beta, v) and player == MIN:
+            beta = v
 
     return (best, v)
 
 def alphabeta(state, player=MAX, maxdepth=6):
-    if player == MAX:
-        v, move = max_value(state, float("-inf"), float("inf"), maxdepth)
-    else:
-        v, move = min_value(state, float("-inf"), float("inf"), maxdepth)
+    v, move = max_value(state, float("-inf"), float("inf"), maxdepth, player)
     return move, v

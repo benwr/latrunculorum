@@ -25,20 +25,31 @@ class ChessState(chess.Board):
             result.append(''.join(line))
         return '\n'.join(reversed(result))
 
-
-    def value(self):
-        """Get ground value of state, if exists, or evaluate(state) if not."""
-        # draws are neutral
+    def winner(self):
         if (self.is_stalemate() or
                 self.is_insufficient_material() or
                 self.can_claim_draw()):
+            return None
+
+        if not self.is_game_over():
+            return False
+
+        return chess.WHITE if self.turn == chess.BLACK else chess.BLACK
+
+
+    def value(self):
+        """Get ground value of state, if exists, or evaluate(state) if not."""
+
+        winner = self.winner()
+        if winner == False:
+            return self.evaluate(self)
+
+        # draws are neutral
+        if winner is None:
             return 0
 
         # Good for winner, bad for loser
-        if self.is_checkmate():
-            return float("inf" if self.turn == chess.BLACK else "-inf")
-
-        return self.evaluate(self)
+        return float("inf" if winner == chess.BLACK else "-inf")
 
     def moves(self):
         return self.generate_legal_moves()

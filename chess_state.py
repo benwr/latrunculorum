@@ -5,10 +5,13 @@ class ChessState(chess.Board):
     """
     Chessboard subclass implementing the interface needed for minimax
     """
-    def __init__(self, evaluate=(lambda _: 0),  fen=None):
+    def __init__(self, evaluate=(lambda _: 0), memoize=False,  fen=None):
         # evaluate is an heuristic function taking a board state
         # and returning an approximate value.
         self.evaluate = evaluate
+        self.memoize = memoize
+        if memoize:
+            self.values = dict()
         super().__init__(fen=fen)
 
     def __str__(self):
@@ -36,27 +39,51 @@ class ChessState(chess.Board):
 
         return chess.WHITE if self.turn == chess.BLACK else chess.BLACK
 
+    def hashable(self):
+        return (self.occupied_co[chess.WHITE],
+                self.occupied_co[chess.BLACK],
+                self.pawns,
+                self.knights,
+                self.bishops,
+                self.rooks,
+                self.queens,
+                self.kings)
 
     def value(self):
         """Get ground value of state, if exists, or evaluate(state) if not."""
+        h = self.hashable()
+
+        if self.memoize and h in self.values:
+            return self.values[h]
+
+        result = None
 
         winner = self.winner()
+
         if winner == False:
-            return self.evaluate(self)
+            # Game's not over
+            result = self.evaluate(self)
+        elif winner is None:
+            # Draws are neutral
+            result = 0
+        else:
+            # Good for winner, bad for loser
+            result = float("inf" if winner == chess.BLACK else "-inf")
 
-        # draws are neutral
-        if winner is None:
-            return 0
-
-        # Good for winner, bad for loser
-        return float("inf" if winner == chess.BLACK else "-inf")
+        if self.memoize:
+            self.values[h] = result
+            
+        return result
 
     def moves(self):
-        return self.generate_legal_moves()
+        for move in self.generate_legal_moves():
+            self.push(move)
+            yield (move, self)
+            self.pop()
 
     def do(self, move):
         """Return a new board resulting from the current player taking move"""
-        result = ChessState(evaluate=self.evaluate, fen=self.fen())
+        result = ChessState(evaluate=self.evaluate, fen=self.fen(), memoize=self.memoize)
         result.push(move)
         return result
 

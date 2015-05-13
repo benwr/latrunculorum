@@ -1,3 +1,5 @@
+import random
+
 class MinimaxState(object):
     """
     Abstract base class of game states suitabe for minimax.
@@ -39,14 +41,61 @@ def minimax(state, player=MAX, maxdepth=-1):
     """
     better = max if player == MAX else min
     results = []
-    for move in state.moves():
-        result = state.do(move)
-        if maxdepth != 0 or result.is_terminal():
+    for move, result in state.moves():
+        # result = state.do(move)
+        if maxdepth == 0 or result.is_terminal():
             results.append((result.value(), move))
         else:
             value = minimax(result, player=(-player), maxdepth=(maxdepth - 1))[0]
             results.append((value, move))
 
-
+    random.shuffle(results)
     best = better(results, key=(lambda a: a[0]))
     return best
+
+def max_value(state, alpha, beta, depth):
+    if state.is_terminal() or depth == 0:
+        return (None, state.value())
+
+    v = float("-inf")
+    best = None
+
+    for move in state.generate_legal_moves():
+        state.push(move)
+        _, result = min_value(state, alpha, beta, depth=(depth-1))
+        if result is not None and v < result:
+            v = result
+            best = move
+        state.pop()
+        if v >= beta:
+            return (move, v)
+        alpha = max(alpha, v)
+
+    return (best, v)
+
+def min_value(state, alpha, beta, depth):
+    if state.is_terminal() or depth == 0:
+        return (None, state.value())
+
+    v = float("inf")
+    best = None
+
+    for move in state.generate_legal_moves():
+        state.push(move)
+        _, result = max_value(state, alpha, beta, depth=(depth-1))
+        if result is not None and v > result:
+            v = result
+            best = move
+        state.pop()
+        if v <= alpha:
+            return (move, v)
+        beta = min(beta, v)
+
+    return (best, v)
+
+def alphabeta(state, player=MAX, maxdepth=6):
+    if player == MAX:
+        v, move = max_value(state, float("-inf"), float("inf"), maxdepth)
+    else:
+        v, move = min_value(state, float("-inf"), float("inf"), maxdepth)
+    return move, v
